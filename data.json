@@ -1,0 +1,102 @@
+{
+    "6319679398": {
+        "balance": 47682,
+        "username": "Apathy",
+        "last_bonus": 1778689830,
+        "inventory": [
+            "🍔 Чебуречник",
+            "🧀 Жирный чебурек"
+        ],
+        "business": {
+            "name": "🥟 Ларёк",
+            "level": 6,
+            "price": 1000,
+            "income": 5000,
+            "last_collect": 1778607617.2771182
+        },
+        "items": []
+    },
+    "7622450160": {
+        "balance": 200,
+        "username": "Витя",
+        "last_bonus": 0
+    },
+    "777000": {
+        "balance": 100,
+        "username": "Telegram",
+        "last_bonus": 0
+    },
+    "promocodes": {
+        "newplayer": {
+            "reward": 500,
+            "uses": 1000,
+            "activated_by": [
+                "6319679398",
+                "7290470234",
+                "7147164083",
+                "8352292391",
+                "5387206226",
+                "7224357589"
+            ]
+        }
+    },
+    "7290470234": {
+        "balance": 700,
+        "username": "Енотик",
+        "last_bonus": 1778558496
+    },
+    "8352292391": {
+        "balance": 500,
+        "username": "ＷＩＲＴＵＡＬ",
+        "last_bonus": 1778598866,
+        "reg_time": 1778563713.951638
+    },
+    "7147164083": {
+        "balance": 800,
+        "username": "Dofik",
+        "last_bonus": 0,
+        "reg_time": 1778563720.3638575
+    },
+    "5387206226": {
+        "balance": 200,
+        "username": "Alon396",
+        "last_bonus": 0,
+        "reg_time": 1778599112.904388,
+        "inventory": [],
+        "business": {
+            "name": "🥟 Ларёк",
+            "level": 2,
+            "price": 1000,
+            "income": 50,
+            "last_collect": 1778600153.4750113
+        }
+    },
+    "7224357589": {
+        "balance": 0,
+        "username": "КЕНТ",
+        "last_bonus": 1778600459,
+        "reg_time": 1778600146.321002,
+        "inventory": [],
+        "business": {
+            "name": "🥟 Ларёк",
+            "level": 2,
+            "price": 1000,
+            "income": 50,
+            "last_collect": 1778601471.9684327
+        }
+    },
+    "6999365345": {
+        "balance": 100,
+        "username": "Руслан",
+        "last_bonus": 0,
+        "reg_time": 1778744209.3236773,
+        "inventory": []
+    },
+    "8400606365": {
+        "balance": 100,
+        "username": "Костя",
+        "last_bonus": 0,
+        "reg_time": 1778756883.1363783,
+        "inventory": []
+    }
+}

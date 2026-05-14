@@ -149,13 +149,9 @@ async def slot_play(update, context, data, user_id, bet):
         await update.callback_query.answer(f"❌ Не хватает! Нужно {bet} 🪙", show_alert=True)
         return
     
-    # Символы для слота
     symbols = ["🍒", "🍊", "🍋", "🍉", "⭐", "💎"]
-    
-    # Крутим слоты
     result = [random.choice(symbols) for _ in range(3)]
     
-    # Проверяем выигрыш
     win = 0
     if result[0] == result[1] == result[2]:
         if result[0] == "💎":
@@ -174,14 +170,12 @@ async def slot_play(update, context, data, user_id, bet):
         win = 0
         win_text = f"❌ ПРОИГРЫШ! -{bet} 🪙"
     
-    # Обновляем баланс
     if win > 0:
         data[user_id]["balance"] += win - bet
     else:
         data[user_id]["balance"] -= bet
     save_data(data)
     
-    # Кнопки для продолжения
     keyboard = InlineKeyboardMarkup([
         [
             InlineKeyboardButton(f"🎰 Крутить за {bet}", callback_data=f"slot_bet_{bet}"),
@@ -301,12 +295,10 @@ async def cmd_inv(update, context, data, user_id):
         text += "*Роли:*\n" + "\n".join([f"• {i}" for i in inv]) + "\n\n"
     
     if items:
-        text += f"*Предметы:* {len(items)} шт.\n\n"
-        text += "👇 Нажми кнопку чтобы использовать:"
+        text += f"*Предметы:* {len(items)} шт.\n\n👇 Нажми кнопку чтобы использовать:"
     else:
         text += "🎁 Нет предметов. Открой кейс: кейсы"
     
-    # Кнопка для управления предметами (только если они есть)
     if items:
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("🎁 Мои предметы", callback_data="show_inventory")]
@@ -354,8 +346,6 @@ async def cmd_promo(update, context, data, user_id):
     
     await update.message.reply_text(f"✅ Промокод активирован! +{promo['reward']} монет!\n💰 Баланс: {data[user_id]['balance']}")
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-
 async def cmd_business(update, context, data, user_id):
     """Команда: бизнес - показать бизнес с кнопками и ценой улучшения"""
     business = data[user_id].get("business", None)
@@ -377,7 +367,6 @@ async def cmd_business(update, context, data, user_id):
     
     level = business.get("level", 1)
     
-    # Доход по уровням
     income_data = {
         1: 50, 2: 80, 3: 120, 4: 180, 5: 250,
         6: 350, 7: 480, 8: 640, 9: 850, 10: 1100,
@@ -385,7 +374,6 @@ async def cmd_business(update, context, data, user_id):
         16: 4500, 17: 5600, 18: 7000, 19: 8700, 20: 11000
     }
     
-    # Цены улучшения по уровням
     upgrade_costs = {
         1: 800, 2: 1000, 3: 1500, 4: 2000, 5: 3000,
         6: 4000, 7: 5000, 8: 7000, 9: 10000, 10: 13000,
@@ -407,7 +395,6 @@ async def cmd_business(update, context, data, user_id):
         minutes_left = int(hours_left * 60)
         pending_text = f"0 🪙 *(через {minutes_left} мин)*"
     
-    # Цена следующего улучшения
     if level < 20:
         next_cost = upgrade_costs.get(level, 10000)
         upgrade_text = f"{next_cost} 🪙 → уровень {level + 1}"
@@ -432,7 +419,7 @@ async def cmd_business(update, context, data, user_id):
     
     await update.message.reply_text(text, parse_mode="Markdown", reply_markup=keyboard)
     
-async def cmd_cases(update, Update, context, data, user_id, is_callback=False):
+async def cmd_cases(update, context, data, user_id, is_callback=False):
     """Команда: кейсы - магазин кейсов"""
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("📦 Обычный кейс (100🪙)", callback_data="case_normal")],
@@ -449,11 +436,7 @@ async def cmd_cases(update, Update, context, data, user_id, is_callback=False):
     )
     
     if is_callback:
-        await update.callback_query.message.edit_text(
-            text,
-            parse_mode="Markdown",
-            reply_markup=keyboard
-        )
+        await update.callback_query.message.edit_text(text, parse_mode="Markdown", reply_markup=keyboard)
     else:
         await update.message.reply_text(text, parse_mode="Markdown", reply_markup=keyboard)
 
@@ -471,24 +454,19 @@ async def open_case(update, context, data, user_id, case_type):
         await update.callback_query.answer(f"❌ Не хватает! Нужно {case['price']} 🪙", show_alert=True)
         return
     
-    # Вычисляем награду (теперь ближе к цене)
     reward = random.randint(case["min_reward"], case["max_reward"])
     
-    # Шанс на выигрыш больше цены: 30% для обычного, 25% для редкого, 20% для легендарного
     win_chance = random.random() < 0.3 if case_type == "normal" else (0.25 if case_type == "rare" else 0.2)
     
     if win_chance and reward < case["price"]:
-        reward = reward * 2  # Удваиваем если выигрышная комбинация
+        reward = reward * 2
     
-    # Предметы (шанс 15% вместо 30%)
     items = ["🍀 Удача", "🎰 Бесплатная ставка", "⭐ Звезда"]
     extra_item = random.choice(items) if random.random() < 0.15 else None
     
-    # Роль (шанс 5% для легендарного вместо 10%)
     roles = ["🍔 Чебуречник", "🧀 Жирный чебурек"]
     extra_role = random.choice(roles) if random.random() < 0.05 and case_type == "legendary" else None
     
-    # Начисляем монеты
     data[user_id]["balance"] += reward - case["price"]
     
     if extra_item:
@@ -541,7 +519,6 @@ async def use_item(update, context, data, user_id, item_name):
         await update.callback_query.answer("❌ У тебя нет этого предмета!", show_alert=True)
         return
     
-    # Эффекты предметов
     effects = {
         "🍀 Удача": {"text": "Тебе повезло! +50 🪙", "action": "money", "value": 50},
         "🎰 Бесплатная ставка": {"text": "Ты получил бесплатную ставку в казино! +100 🪙", "action": "money", "value": 100},
@@ -555,14 +532,12 @@ async def use_item(update, context, data, user_id, item_name):
         await update.callback_query.answer("❌ Этот предмет нельзя использовать!", show_alert=True)
         return
     
-    # Применяем эффект
     if effect["action"] == "money":
         data[user_id]["balance"] += effect["value"]
         save_data(data)
         result_text = f"💰 {effect['text']}\n💎 Новый баланс: {data[user_id]['balance']} 🪙"
     
     elif effect["action"] == "exp":
-        # Опыт влияет на уровень
         balance = data[user_id]["balance"]
         level = max(1, balance // 500 + 1)
         exp_needed = level * 500
@@ -570,7 +545,6 @@ async def use_item(update, context, data, user_id, item_name):
         new_exp = exp_current + effect["value"]
         
         if new_exp >= exp_needed:
-            # Повышение уровня
             data[user_id]["balance"] += (new_exp - exp_needed) + 500
             save_data(data)
             result_text = f"📈 {effect['text']}\n✨ Ты повысил уровень! Новый баланс: {data[user_id]['balance']} 🪙"
@@ -579,7 +553,6 @@ async def use_item(update, context, data, user_id, item_name):
             save_data(data)
             result_text = f"📈 {effect['text']}\n💎 Новый баланс: {data[user_id]['balance']} 🪙"
     
-    # Удаляем использованный предмет
     items.remove(item_name)
     data[user_id]["items"] = items
     save_data(data)
@@ -610,17 +583,9 @@ async def cmd_items(update, context, data, user_id, is_callback=False):
     text = f"📦 *Твои предметы*\n\nВсего: {len(items)} шт.\n\n👇 Нажми на предмет чтобы использовать:"
     
     if is_callback:
-        await update.callback_query.message.edit_text(
-            text,
-            parse_mode="Markdown",
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
+        await update.callback_query.message.edit_text(text, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(keyboard))
     else:
-        await update.message.reply_text(
-            text,
-            parse_mode="Markdown",
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
+        await update.message.reply_text(text, parse_mode="Markdown", reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработчик нажатий на кнопки"""
@@ -757,7 +722,6 @@ async def upgrade_business(update, context, data, user_id):
         await update.callback_query.answer("🏆 Бизнес уже максимального уровня!", show_alert=True)
         return
     
-    # Цены улучшения по уровням
     upgrade_costs = {
         1: 800, 2: 1000, 3: 1500, 4: 2000, 5: 3000,
         6: 4000, 7: 5000, 8: 7000, 9: 10000, 10: 13000,
@@ -765,7 +729,6 @@ async def upgrade_business(update, context, data, user_id):
         16: 60000, 17: 80000, 18: 100000, 19: 150000
     }
     
-    # Доход после улучшения (для нового уровня)
     income_after = {
         2: 80, 3: 120, 4: 180, 5: 250, 6: 350,
         7: 480, 8: 640, 9: 850, 10: 1100, 11: 1400,
@@ -781,7 +744,6 @@ async def upgrade_business(update, context, data, user_id):
         await update.callback_query.answer(f"❌ Не хватает! Нужно {cost} 🪙", show_alert=True)
         return
     
-    # Улучшаем
     data[user_id]["balance"] -= cost
     business["level"] = new_level
     save_data(data)
@@ -813,7 +775,6 @@ async def collect_income(update, context, data, user_id):
     
     level = business.get("level", 1)
     
-    # Доход по уровням
     income_data = {
         1: 50, 2: 80, 3: 120, 4: 180, 5: 250,
         6: 350, 7: 480, 8: 640, 9: 850, 10: 1100,
@@ -825,7 +786,7 @@ async def collect_income(update, context, data, user_id):
     last_collect = business.get("last_collect", time.time())
     
     seconds_passed = int(time.time() - last_collect)
-    hours_passed = min(seconds_passed // 3600, 24)  # Не больше 24 часов
+    hours_passed = min(seconds_passed // 3600, 24)
     
     if hours_passed < 1:
         await update.callback_query.answer("⏱ Доход будет через час!", show_alert=True)
@@ -898,7 +859,7 @@ async def cmd_create_promo(update, context, data, user_id):
     
     await update.message.reply_text(f"✅ Промокод {code} создан! Награда: {reward} монет, лимит: 10 использований")
 
-# ========== СЛОВАРЬ КОМАНД (ЛЕГКО ДОБАВЛЯТЬ/УДАЛЯТЬ) ==========
+# ========== СЛОВАРЬ КОМАНД ==========
 COMMANDS = {
     "б": cmd_balance,
     "п": cmd_profile,
@@ -914,7 +875,7 @@ COMMANDS = {
     "создатьпромо": cmd_create_promo,
     "бизнес": cmd_business,
     "кейсы": cmd_cases,
-    "предметы": cmd_items,  # ← ДОБАВИТЬ ЭТУ СТРОКУ
+    "предметы": cmd_items,
 }
 
 # ========== ОБРАБОТЧИК ==========
@@ -932,7 +893,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = load_data()
     data = register_user(data, user_id, user.username, user.first_name)
     
-    # ========== ОБРАБОТКА ПОЛЬЗОВАТЕЛЬСКОЙ СТАВКИ ДЛЯ КАЗИНО ==========
     if context.user_data.get("awaiting_slot_bet"):
         try:
             bet = int(text)
@@ -963,7 +923,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("❌ Введи число!")
         return
     
-    # ========== ПРОВЕРКА КОМАНД ==========
     for cmd_prefix, cmd_func in COMMANDS.items():
         if text == cmd_prefix or text.startswith(f"{cmd_prefix} "):
             await cmd_func(update, context, data, user_id)
@@ -987,7 +946,6 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def top_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Топ богачей /top"""
     if not update.message:
         return
     
@@ -997,13 +955,11 @@ async def top_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("📊 Пока нет зарегистрированных игроков!")
         return
     
-    # Фильтруем игроков с балансом > 0
     filtered_data = {}
     for user_id, user_data in data.items():
         balance = user_data.get("balance", 0)
         name = user_data.get("username", "")
         
-        # Пропускаем служебные аккаунты и нулевые балансы
         if str(user_id).startswith("-"):
             continue
         if name.lower() in ["telegram", "group", "bot", ""]:
@@ -1017,7 +973,6 @@ async def top_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("📊 Пока нет игроков с балансом!")
         return
     
-    # Сортируем по балансу
     sorted_players = sorted(filtered_data.items(), key=lambda x: x[1].get("balance", 0), reverse=True)
     top_10 = sorted_players[:10]
     
@@ -1054,4 +1009,8 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_handler(CallbackQueryHandler(button_handler))
     
+    print("✅ Бот запущен!")
     app.run_polling()
+
+if __name__ == "__main__":
+    main()
